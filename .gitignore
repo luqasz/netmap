@@ -1,0 +1,23 @@
+#python compiled files
+*.py[cod]
+__pycache__
+
+#package related files / dirs
+*.deb
+dist
+build
+sdist
+MANIFEST
+.project
+*.egg-info
+
+
+#eclipse files and directories
+.pydevproject
+.settings
+
+#pytest cache
+.cache
+
+# PyCharm IDE
+.idea
