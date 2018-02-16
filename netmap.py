@@ -8,7 +8,7 @@
 
 from collections import namedtuple
 
-Connection = namedtuple('Connection', ('swa', 'swa_port', 'swb', 'swb_port'))
+Connection = namedtuple('Connection', ('swA', 'swAport', 'swB', 'swBport'))
 SwitchPort = namedtuple('SwitchPort', ('name', 'port'))
 
 switches = {
@@ -51,5 +51,5 @@ for sw, sw_mac in switches.items():
         # Construct a tuple with switch names which are visable on a given port.
         haystack = tuple(sw_name for sw_name, mac in switches.items() if mac in port_macs)
         for found in nearest_neighbours(macs=port_macs, haystack=haystack):
-            conn = Connection(swa=sw, swa_port=port, swb=found.name, swb_port=found.port)
+            conn = Connection(swA=sw, swAport=port, swB=found.name, swBport=found.port)
             print(conn)
