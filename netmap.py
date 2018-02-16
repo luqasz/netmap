@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # vim: set fileencoding=utf-8 :
 
-# Switch are considered to be directly connected when:
+# Devices are considered to be directly connected when:
 # switch A sees (in direction of switch B) different hosts then
 # switch B sees (in direction of switch A)
+# In other words, they do not have a common switch between them.
 
 from collections import namedtuple
 
@@ -34,29 +35,21 @@ switch_fdb = {
             },
         }
 
-connections = set()
 
-
-def nearest_neighbour(target_sw, macs):
-    # z macs wez macki wszyskich switchy
-    macs = set(macs)
-    found_on = (sw_name for sw_name, mac in switches.items() if mac in macs)
-    for sw_name in found_on:
+def nearest_neighbours(macs, haystack):
+    for sw_name in haystack:
         for port, fdb in switch_fdb[sw_name].items():
             fdb = set(fdb)
+            # No common macs means direct connection
             if macs.isdisjoint(fdb):
-                return SwitchPort(name=sw_name, port=port)
-        # przejdz po switchach i
-        # poszukaj portow na ktorych widac target_sw
-        # iterujac po tym znajdz set(macs).isdisjoint(macki z portu danego sw)
+                yield SwitchPort(name=sw_name, port=port)
 
 
 for sw, sw_mac in switches.items():
-    # wez tablice fdb dla danego sw
-    # dla kazdego portu i mackow z portu, poszukaj najblizszego sasiada
     for port, port_macs in switch_fdb[sw].items():
-        found = nearest_neighbour(sw, port_macs)
-        if found:
+        port_macs = set(port_macs)
+        # Construct a tuple with switch names which are visable on a given port.
+        haystack = tuple(sw_name for sw_name, mac in switches.items() if mac in port_macs)
+        for found in nearest_neighbours(macs=port_macs, haystack=haystack):
             conn = Connection(swa=sw, swa_port=port, swb=found.name, swb_port=found.port)
             print(conn)
-            connections.add(conn)
